@@ -39,6 +39,7 @@ public class CorsoDAO {
 				corsi.add(c);// Aggiungi il nuovo Corso alla lista
 			}
 
+			
 			return corsi;
 
 		} catch (SQLException e) {
@@ -70,7 +71,7 @@ public class CorsoDAO {
 				int x1=Integer.parseInt(rs.getString("pd"));
 
 				Corso c = new Corso(rs.getString("codins"),x,rs.getString("nome"),x1);}
-
+			
 		} catch (SQLException e) {
 			// e.printStackTrace();
 			throw new RuntimeException("Errore Db");
@@ -103,6 +104,7 @@ public class CorsoDAO {
 			studenti.add(s);
 			}
 
+			
 		} catch (SQLException e) {
 			// e.printStackTrace();
 			throw new RuntimeException("Errore Db");
@@ -118,7 +120,31 @@ public class CorsoDAO {
 	 * iscrivi lo studente al corso.
 	 */
 	public boolean inscriviStudenteACorso(Studente studente, Corso corso) {
-		// TODO
+		
+		final String sql = "INSERT INTO iscrizione (matricola,codins) VALUES ('?','?')";
+
+		try {
+			Connection conn = ConnectDB.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			
+			st.setString(1, studente.getMatricola());
+			st.setString(2, corso.getCodins());
+			
+			ResultSet rs = st.executeQuery();
+
+			while (rs.next()) {        //COME CAPIRE SE GIUSTO??
+				if(!rs.wasNull()){
+					return true;
+				}
+			
+			}
+			conn.close();
+			
+		} catch (SQLException e) {
+			// e.printStackTrace();
+			throw new RuntimeException("Errore Db");
+		}
+			
 		return false;
 	}
 }

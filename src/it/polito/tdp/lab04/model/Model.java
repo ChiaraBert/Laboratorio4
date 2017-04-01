@@ -1,5 +1,6 @@
 package it.polito.tdp.lab04.model;
 
+import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -40,11 +41,23 @@ public class Model {
 		return s;
 	}
 	
-	public boolean trovato(Corso c,Studente s){
-		boolean trovato=false;
+	public boolean trovato(Corso c,String matricola){
+		boolean t=false;
 		StudenteDAO er= new StudenteDAO();
-		trovato=er.EsisteStudenteInCorso(c, s);
-		return trovato;
+		t=er.EsisteStudenteInCorso(c, matricola);
+		return t;
 	}
+
+	public boolean aggiungiStudente(Corso c, Studente s) {
+		// TODO Auto-generated method stub
+		boolean t=false;
+		CorsoDAO cr = new CorsoDAO();
+		t=cr.inscriviStudenteACorso(s, c);
+		return t;
+	}
+
+	
+
+	
 
 }

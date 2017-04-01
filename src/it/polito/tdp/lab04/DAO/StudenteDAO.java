@@ -35,11 +35,15 @@ public class StudenteDAO {
 			ResultSet rs = st.executeQuery();
 
 			while (rs.next()) {
+				if(rs.wasNull()){
+					return result;
+				}
+					
 				Studente s=new Studente(rs.getString("matricola"),rs.getString("nome"),rs.getString("cognome"),rs.getString("cds"));
 				result=s;}
 				
 			
-			conn.close();
+			
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -74,7 +78,7 @@ public class StudenteDAO {
 			corsi.add(s);}
 			
 		
-		conn.close();
+		
 		
 		} catch (SQLException e) {
 		e.printStackTrace();
@@ -84,7 +88,7 @@ public class StudenteDAO {
 
 	}
 	
-	public boolean EsisteStudenteInCorso(Corso c, Studente s){
+	public boolean EsisteStudenteInCorso(Corso c, String matricola){
 		boolean trovato=false;
 		
 		final String sql = "SELECT * "+
@@ -95,17 +99,19 @@ public class StudenteDAO {
 		Connection conn = ConnectDB.getConnection();
 		PreparedStatement st = conn.prepareStatement(sql);
 		
-		st.setString(1, s.getMatricola());
+		st.setString(1, matricola);
 		st.setString(2, c.getCodins());
 		
 		ResultSet rs = st.executeQuery();
 		
-		if(rs!=null) {
-			trovato=true;
+		while(rs.next()) {
+			
+			if(!rs.wasNull())
+				trovato=true;
 			}
 			
 		
-		conn.close();
+		
 		
 		} catch (SQLException e) {
 		e.printStackTrace();
@@ -113,5 +119,7 @@ public class StudenteDAO {
 		}
 		return trovato;
 	}
+
+	
 	
 }

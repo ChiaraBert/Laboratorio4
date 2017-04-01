@@ -1,10 +1,13 @@
 package it.polito.tdp.lab04.controller;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Collections;
 
 import java.util.LinkedList;
 import java.util.List;
 
+import it.polito.tdp.lab04.DAO.ConnectDB;
 import it.polito.tdp.lab04.model.Corso;
 import it.polito.tdp.lab04.model.Model;
 import it.polito.tdp.lab04.model.Studente;
@@ -70,8 +73,11 @@ public class SegreteriaStudentiController {
 	@FXML
 	void doCercaNome(ActionEvent event) {
 		
-		Corso c= comboCorso.getValue();
 		String codice = txtMatricola.getText();
+		
+		if(codice.matches("[a-zA-Z]*")){
+			txtResult.setText("Inserire solo caratteri numerici");
+			return;}
     	
     	if(codice.length()>11){
     		txtResult.appendText("Matricola inesistente\n");	
@@ -96,6 +102,11 @@ public class SegreteriaStudentiController {
 	@FXML
 	void doCercaIscrittiCorso(ActionEvent event) {
 		List<Studente> studenti=new LinkedList<Studente>();
+		
+		String matricola=txtMatricola.getText();
+		
+		boolean trov=false;
+		
 		String ris="";
 		Corso c=comboCorso.getValue();
 				
@@ -103,18 +114,51 @@ public class SegreteriaStudentiController {
 			txtResult.setText("Non hai selezionato un corso");
 			return;
 		}
-		else 
+		
+		if(matricola.isEmpty()) {
 			studenti=m.cercaStudentiDalCorso(c);
 		
-		for(Studente s: studenti)
-			ris+=s.toString()+"\n";
+		for(Studente s: studenti){
+			ris+=s.toString()+"\n";}
+		
 		txtResult.setText(ris);
+		return;
+							}
+		
+		if(!matricola.isEmpty()){
+			if(matricola.matches("[a-zA-Z]*")){
+				txtResult.setText("Inserire solo caratteri numerici");
+				return;}
+			
+			if(m.CercaStudente(matricola)==null){
+				txtResult.appendText("Studente non esiste\n");
+				return;
+			}
+			trov=m.trovato(c,matricola);
+			if(trov==false){
+				txtResult.setText("Studente non iscritto a questo corso\n");
+				return;
+							}
+			if(trov==true){
+				txtResult.setText("Studente già iscritto a questo corso\n");
+				return; }
+		}
 	}
 
 	@FXML
-	void doCercaCorsi(ActionEvent event) {
+	void doCercaCorsi(ActionEvent event) throws SQLException {
 		List<Corso> c = new LinkedList<Corso>();
 		String matricola=txtMatricola.getText();
+		
+		if(matricola.matches("[a-zA-Z]*")){
+			txtResult.setText("Inserire solo caratteri numerici");
+			return;}
+		
+		if(m.CercaStudente(matricola)==null){
+			txtResult.appendText("Studente non esiste\n");
+			return;
+		}
+		
 		c=m.CercaCorsiDelloStudente(matricola);
 		String ris="";
 		for(Corso c1 : c){  
@@ -127,6 +171,31 @@ public class SegreteriaStudentiController {
 	void doIscrivi(ActionEvent event) {
 		Corso c=comboCorso.getValue();
 		String matricola=txtMatricola.getText();
+		boolean trovato=false;
+		
+		if(c==null){
+			txtResult.setText("Non hai selezionato un corso");
+			return;
+		}
+		if(matricola.matches("[a-zA-Z]*")){
+			txtResult.setText("Inserire solo caratteri numerici");
+			return;}
+		
+		Studente s=m.CercaStudente(matricola);
+		if(s==null){
+			txtResult.appendText("Studente non esiste\n");
+			return;
+		}
+		else {
+    		txtNome.setText(s.getNome());
+    		txtCognome.setText(s.getCognome());
+    		trovato=m.aggiungiStudente(c,s);
+    		if(trovato==true){
+    			txtResult.appendText("Studente iscritto al corso\n");
+    			return;
+    		}
+		}
+		
 	
 	}
 			
